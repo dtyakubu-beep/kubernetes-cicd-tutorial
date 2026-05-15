@@ -32,28 +32,22 @@ jobs:
             ghcr.io/${{ github.repository }}:${{ github.sha }}
 
       - name: Update GitOps repository
-        shell: bash
         env:
           GIT_TOKEN: ${{ secrets.GITOPS_PAT }}
         run: |
           set -e
-          git config --global credential.helper store
-          echo "https://${GIT_TOKEN}:x-oauth-basic@github.com" > ~/.git-credentials
-          
           rm -rf gitops
-          
-          git clone https://github.com/dtyakubu-beep/grade-api-gitops.git gitops
+          git clone "https://x-oauth-basic:${GIT_TOKEN}@github.com/dtyakubu-beep/grade-api-gitops.git" gitops
           cd gitops
           
           if [[ "$OSTYPE" == "darwin"* ]]; then
             sed -i '' "s|image: ghcr.io/${{ github.repository }}:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|g" deployment.yaml
           else
-            sed -i '' "s|image: ghcr.io/${{ github.repository }}:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|g" deployment.yaml
+            sed -i'' "s|image: ghcr.io/${{ github.repository }}:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|g" deployment.yaml
           fi
           
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
           git add deployment.yaml
           git commit -m "Update image to ${{ github.sha }}"
-          
-          git push -f "https://${GIT_TOKEN}@github.com/dtyakubu-beep/grade-api-gitops.git" main
+          git push origin main
