@@ -39,12 +39,14 @@ jobs:
           rm -rf gitops
           git clone "https://x-oauth-basic:${GIT_TOKEN}@github.com/dtyakubu-beep/grade-api-gitops.git" gitops
           cd gitops
-          
+          cat deployment.yaml
           if [[ "$OSTYPE" == "darwin"* ]]; then
             sed -i '' "s|image: ghcr.io/${{ github.repository }}:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|g" deployment.yaml
           else
             sed -i '' "s|image: ghcr.io/${{ github.repository }}:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|g" deployment.yaml
           fi
+          
+          cat deployment.yaml
           
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
